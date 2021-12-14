@@ -4,7 +4,11 @@ const controller = require('./controller');
 
 const router = express.Router();
 
-router.route('/').get(controller.all).post(controller.create);
+router.route('/').get(controller.all);
+
+router.route('/signin').get(controller.all).post(controller.signin);
+
+router.route('/signup').get(controller.all).post(controller.signup);
 
 router.param('id', controller.id);
 

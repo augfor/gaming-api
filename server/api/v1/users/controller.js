@@ -61,7 +61,47 @@ exports.all = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.signin = async (req, res, next) => {
+  // Receives information
+  const { body = {} } = req;
+  const { email, password } = body;
+
+  try {
+    // Search user (document) by email
+    const user = await Model.findOne({
+      email,
+    }).exec();
+    // 401 if user doesn't exist
+    const message = 'Invalid email or password';
+    const statusCode = 401;
+
+    if (!user) {
+      return next({
+        message,
+        statusCode,
+      });
+    }
+
+    // Verify password if user exists
+    const verified = await user.verifyPassword(password);
+    if (!verified) {
+      // Return 401 if it doesn't exist
+      return next({
+        message,
+        statusCode,
+      });
+    }
+
+    // Return user's information if verified
+    return res.json({
+      data: user,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.signup = async (req, res, next) => {
   const { body = {} } = req;
   const document = new Model(body);
 
