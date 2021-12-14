@@ -1,49 +1,117 @@
-exports.all = (req, res, next) => {
-  const { query = {} } = req;
+const { Model, fields } = require('./model');
+const {
+  paginationParams,
+  sortParams,
+  sortTransform,
+} = require('../../../utils');
 
-  res.json({
-    ...query,
-  });
+exports.id = async (req, res, next) => {
+  const { params = {} } = req;
+  const { id = '' } = params;
+
+  try {
+    const data = await Model.findById(id);
+
+    if (!data) {
+      const message = `${Model.modelName} not found`;
+
+      next({
+        message,
+        statusCode: 404,
+        level: 'warn',
+      });
+    } else {
+      req.doc = data;
+
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.create = (req, res, next) => {
+exports.all = async (req, res, next) => {
+  const { query } = req;
+  const { page, limit, skip } = paginationParams(query);
+  const { sortBy, direction } = sortParams(query, fields);
+
+  const docs = Model.find({})
+    .sort(sortTransform(sortBy, direction))
+    .skip(skip)
+    .limit(limit);
+  const all = Model.countDocuments();
+
+  try {
+    const response = await Promise.all([docs.exec(), all.exec()]);
+    const [data, total] = response;
+    const pages = Math.ceil(total / limit);
+
+    res.json({
+      data,
+      meta: {
+        total,
+        pages,
+        page,
+        limit,
+        skip,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.create = async (req, res, next) => {
   const { body = {} } = req;
+  const document = new Model(body);
+
+  try {
+    const data = await document.save();
+    const status = 201;
+
+    res.status(status);
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.read = async (req, res, next) => {
+  const { doc = {} } = req;
 
   res.json({
-    ...body,
-    meta: {
-      status: 200,
-    },
+    data: doc,
   });
 };
 
-exports.read = (req, res, next) => {
-  const { params = {} } = req;
-  const { id = '' } = params;
+exports.update = async (req, res, next) => {
+  const { doc = {}, body = {} } = req;
 
-  res.json({
-    id,
-  });
+  Object.assign(doc, body);
+
+  try {
+    const data = await doc.save();
+
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.update = (req, res, next) => {
-  const { params = {}, body = {}, query = {} } = req;
+exports.delete = async (req, res, next) => {
+  const { doc = {} } = req;
 
-  res.json({
-    ...body,
-    ...params,
-    meta: {
-      ...query,
-      status: 200,
-    },
-  });
-};
+  try {
+    const data = await doc.remove();
 
-exports.delete = (req, res, next) => {
-  const { params = {} } = req;
-  const { id = '' } = params;
-
-  res.json({
-    id,
-  });
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
