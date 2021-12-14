@@ -5,14 +5,12 @@ const { logger, requestId, requestLog } = require('./config/logger');
 
 const app = express();
 
-// middlewares
 app.use(requestId);
 
 app.use(requestLog);
 
-app.use(express.json()); // parse application/json
+app.use(express.json());
 
-// API
 app.use('/api', api);
 
 app.use((req, res, next) => {
@@ -27,14 +25,22 @@ app.use((req, res, next) => {
   });
 });
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message = '' } = err;
+app.use((error, req, res, next) => {
+  const { message = '', name = '' } = error;
+  let { statusCode = 500 } = error;
 
-  logger.error(message);
+  if (name === 'ValidationError') {
+    statusCode = 422;
+
+    logger.warn(message);
+  } else {
+    logger.error(message);
+  }
 
   res.status(statusCode);
   res.json({
     message,
+    error,
   });
 });
 

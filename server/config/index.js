@@ -7,6 +7,21 @@ const config = {
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
   },
+  pagination: {
+    page: 1,
+    limit: 10,
+    skip: 0,
+  },
+  sort: {
+    sortBy: {
+      default: 'createdAt',
+      fields: ['createdAt', 'updatedAt'],
+    },
+    direction: {
+      default: 'desc',
+      options: ['asc', 'desc'],
+    },
+  },
 };
 
 module.exports = config;
