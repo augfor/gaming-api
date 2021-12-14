@@ -1,29 +1,18 @@
 const express = require('express');
-const morgan = require('morgan');
-const { v4: uuidv4 } = require('uuid');
 
 const api = require('./api/v1');
-const logger = require('./config/logger');
+const { logger, requestId, requestLog } = require('./config/logger');
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader('X-Request-Id', uuidv4());
+// middlewares
+app.use(requestId);
 
-  next();
-});
+app.use(requestLog);
 
-// prettier-ignore
-app.use(
-  morgan('combined', {
-    stream: {
-      write: (message) => logger.info(message),
-    },
-  }),
-);
+app.use(express.json()); // parse application/json
 
-app.use(express.json());
-
+// API
 app.use('/api', api);
 
 app.use((req, res, next) => {
