@@ -4,6 +4,7 @@ const {
   sortParams,
   sortTransform,
 } = require('../../../utils');
+const { signToken } = require('../auth');
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
@@ -61,7 +62,7 @@ exports.all = async (req, res, next) => {
   }
 };
 
-exports.signin = async (req, res, next) => {
+exports.login = async (req, res, next) => {
   // Receives information
   const { body = {} } = req;
   const { email, password } = body;
@@ -71,9 +72,9 @@ exports.signin = async (req, res, next) => {
     const user = await Model.findOne({
       email,
     }).exec();
-    // 401 if user doesn't exist
+    // If user doesn't exist
     const message = 'Invalid email or password';
-    const statusCode = 401;
+    const statusCode = 200;
 
     if (!user) {
       return next({
@@ -84,17 +85,24 @@ exports.signin = async (req, res, next) => {
 
     // Verify password if user exists
     const verified = await user.verifyPassword(password);
+
     if (!verified) {
-      // Return 401 if it doesn't exist
       return next({
         message,
         statusCode,
       });
     }
 
+    const token = signToken({
+      id: user.id,
+    });
+
     // Return user's information if verified
     return res.json({
       data: user,
+      meta: {
+        token,
+      },
     });
   } catch (error) {
     return next(error);
@@ -110,8 +118,16 @@ exports.signup = async (req, res, next) => {
     const status = 201;
 
     res.status(status);
+
+    const token = signToken({
+      id: data.id,
+    });
+
     res.json({
       data,
+      meta: {
+        token,
+      },
     });
   } catch (error) {
     next(error);
@@ -126,13 +142,27 @@ exports.read = async (req, res, next) => {
   });
 };
 
-exports.update = async (req, res, next) => {
-  const { doc = {}, body = {} } = req;
-
-  Object.assign(doc, body);
+exports.profile = async (req, res, next) => {
+  const { decoded } = req;
+  const { id } = decoded;
 
   try {
-    const data = await doc.save();
+    const data = await Model.findById(id);
+
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  const { body = {}, decoded } = req;
+  const { id } = decoded;
+
+  try {
+    const data = await Model.findByIdAndUpdate(id, body, { new: true });
 
     res.json({
       data,
@@ -143,10 +173,11 @@ exports.update = async (req, res, next) => {
 };
 
 exports.delete = async (req, res, next) => {
-  const { doc = {} } = req;
+  const { decoded } = req;
+  const { id } = decoded;
 
   try {
-    const data = await doc.remove();
+    const data = await Model.findByIdAndDelete(id);
 
     res.json({
       data,

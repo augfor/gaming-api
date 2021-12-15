@@ -1,22 +1,25 @@
 const express = require('express');
 
 const controller = require('./controller');
+const { auth } = require('../auth');
 
 const router = express.Router();
 
 router.route('/').get(controller.all);
 
-router.route('/signin').get(controller.all).post(controller.signin);
+router.route('/login').post(controller.login);
 
-router.route('/signup').get(controller.all).post(controller.signup);
+router.route('/signup').post(controller.signup);
+
+router
+  .route('/profile')
+  .get(auth, controller.profile)
+  .put(auth, controller.update)
+  .patch(auth, controller.update)
+  .delete(auth, controller.delete);
 
 router.param('id', controller.id);
 
-router
-  .route('/:id')
-  .get(controller.read)
-  .put(controller.update)
-  .patch(controller.update)
-  .delete(controller.delete);
+router.route('/:id').get(auth, controller.read);
 
 module.exports = router;

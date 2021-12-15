@@ -16,6 +16,7 @@
       {
         "argsIgnorePattern": "next"
       }
-    ]
+    ],
+    "implicit-arrow-linebreak": "off"
   }
 }
