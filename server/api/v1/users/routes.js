@@ -2,6 +2,7 @@ const express = require('express');
 
 const controller = require('./controller');
 const { auth } = require('../auth');
+const { sanitizers } = require('./model');
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ router.route('/').get(controller.all);
 
 router.route('/login').post(controller.login);
 
-router.route('/signup').post(controller.signup);
+router.route('/signup').post(sanitizers, controller.signup);
 
 router
   .route('/profile')
