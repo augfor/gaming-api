@@ -178,9 +178,11 @@ exports.delete = async (req, res, next) => {
 
   try {
     const data = await Model.findByIdAndDelete(id);
+    const message = 'Your profile has been successfully deleted';
 
     res.json({
       data,
+      message,
     });
   } catch (error) {
     next(error);
