@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 
 const api = require('./api/v1');
 const { logger, requestId, requestLog } = require('./config/logger');
 const { cors: corsConfig } = require('./config');
+const swaggerDocument = require('./api/v1/swagger.json');
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use(requestLog);
 app.use(express.json());
 
 app.use('/api', api);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res, next) => {
   const statusCode = 404;
