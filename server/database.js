@@ -6,7 +6,7 @@ exports.connect = ({ url = '', username, password }, options = {}) => {
   let dburl = '';
 
   if (username && password) {
-    dburl = `mongodb://${username}:${password}@${url}`;
+    dburl = `mongodb+srv://${username}:${password}@${url}`;
   } else {
     dburl = `mongodb://${url}`;
   }
