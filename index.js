@@ -1,17 +1,12 @@
 const http = require('http');
 
 const app = require('./server');
-const config = require('./server/config');
 const { connect } = require('./server/database');
 
-const { port, database } = config;
+const config = require('./server/config');
+const { port } = config;
 
-connect({
-  protocol: database.protocol,
-  url: database.url,
-  username: database.username,
-  password: database.password,
-});
+connect();
 
 const server = http.createServer(app);
 

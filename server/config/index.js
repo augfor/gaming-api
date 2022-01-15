@@ -1,13 +1,7 @@
 require('dotenv').config();
 
 const config = {
-  port: process.env.PORT || 3000,
-  database: {
-    protocol: process.env.DATA_BASE_PROTOCOL,
-    url: process.env.DATABASE_URL,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-  },
+  port: process.env.PORT || 4000,
   pagination: {
     page: 1,
     limit: 10,

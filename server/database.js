@@ -2,21 +2,11 @@ const mongoose = require('mongoose');
 
 const { logger } = require('./config/logger');
 
-exports.connect = (
-  { protocol = 'mongodb', url = '', username, password },
-  options = {}
-) => {
-  let dburl = '';
-
-  if (username && password) {
-    dburl = `${protocol}+srv://${username}:${password}@${url}`;
-  } else {
-    dburl = `${protocol}://${url}`;
-  }
-
-  mongoose.connect(dburl, {
-    ...options,
-  });
+exports.connect = (options = {}) => {
+  mongoose.connect(
+    process.env.MONGO_DB_URI || 'mongodb://127.0.0.1:27017/gaming',
+    { useNewUrlParser: true }
+  );
 
   mongoose.connection.on('connected', () => {
     logger.info('Database connected');
