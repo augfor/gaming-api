@@ -5,6 +5,7 @@ const {
   sortTransform,
 } = require('../../../utils');
 const { signToken } = require('../auth');
+const { emailConfirmation } = require('../../../utils/email-confirmation');
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
@@ -122,6 +123,10 @@ exports.signup = async (req, res, next) => {
     const token = signToken({
       id: data.id,
     });
+
+    emailConfirmation(data.firstName, data.email);
+
+    console.log('User created');
 
     res.json({
       data,

@@ -24,6 +24,11 @@ const config = {
   cors: {
     origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN,
   },
+  email: {
+    sendgridApiKey: process.env.SENDGRID_API_KEY,
+    senderEmail: process.env.SENDER_EMAIL,
+    senderUsername: process.env.SENDER_USERNAME,
+  },
 };
 
 module.exports = config;
