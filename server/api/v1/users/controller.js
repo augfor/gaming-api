@@ -96,6 +96,7 @@ exports.login = async (req, res, next) => {
 
     const token = signToken({
       id: user.id,
+      password: user.password,
     });
 
     // Return user's information if verified
@@ -122,6 +123,7 @@ exports.signup = async (req, res, next) => {
 
     const token = signToken({
       id: data.id,
+      password: data.password,
     });
 
     emailConfirmation(data.firstName, data.email);
