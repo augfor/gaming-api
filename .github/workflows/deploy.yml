@@ -1,0 +1,22 @@
+name: Deploy Backend
+
+on:
+  push:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: .
+
+env:
+  MONGO_DB_URI: mongodb+srv://jersonzc:NTLlWyMj0N0E12FJ@cluster0.jbfzg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Tests
+        run: npm test

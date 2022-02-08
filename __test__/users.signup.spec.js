@@ -7,7 +7,7 @@ const { Model: User } = require('../server/api/v1/users/model');
 
 describe('Users', () => {
   beforeAll(() => {
-    database.connect({ url: `${config.database.url}-test` });
+    database.connect();
   });
 
   beforeEach(() => {
